@@ -6,7 +6,8 @@
 #define Batom 0.0
 
 #define NMAX 100000  /* Maximum number of atoms which can be simulated */
-#define RCUT 2.5     /* Potential cut-off length */
+// #define RCUT 2.5     /* Potential cut-off length */
+#define RCUT 0.4
 #define PI 3.141592653589793
 /* Constants for the random number generator */
 #define D2P31M 2147483647.0
@@ -40,7 +41,7 @@ int StepAvg;        /* Reporting interval for statistical data */
 
 /* Constants ******************************************************************/
 
-double Region[3];  /* MD box lengths */
+double Region[3];  /* MD (Simulated usable area) box lengths */
 double RegionH[3]; /* Half the box lengths */
 double DeltaTH;    /* Half the time step */
 double Uc, Duc;    /* Potential cut-off parameters */
