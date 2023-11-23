@@ -13,6 +13,8 @@
 #include <GLUT/glut.h>    /* Header file for the GLut library */
 #include <time.h>
 #include <stdlib.h>
+#include <sys/time.h>                // for gettimeofday()
+// #include <stdbool.h>
 
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
 #define MIN(x,y) (((x) < (y)) ? (x) : (y))
@@ -20,6 +22,7 @@
 GLuint sphereid;          /* display-list id of atom sphere geom */
 GLuint atomsid;           /* display-list id of all atoms */
 GLuint boundsid;          /* display-list id for boundary lines */
+GLuint buttonsid;
 GLdouble fovy, aspect, near_clip, far_clip;  
                           /* parameters for gluPerspective() */
 FILE *fp;                 /* pointer to open an MD-configuration file */
@@ -34,6 +37,7 @@ void drawScene(void);
 void display(void);
 void initView(float *, float *);
 void readConf(void);
+void rotateCamera (double delta);
 
 double SignR(double v,double x) {if (x > 0) return v; else return -v;}
 double Dmod(double a, double b) {
@@ -53,52 +57,68 @@ void RandVec3(double *p, double *seed) {
 	p[2] = 1.0 - 2.0*s; s = 2.0*sqrt(1.0 - s); p[0] = s*x; p[1] = s*y;
 }
 
-void InitParams();
+double dot_product(double *v, double *u, int n)
+{
+    double result = 0.0;
+    for (int i = 0; i < n; i++)
+        result += (double)v[i] * (double)u[i];
+    return result;
+}
+
+double distance(double *p1, double *p2, int n) {
+  double dist = 0.0;
+  for (int i = 0; i < n; i++){
+    dist = sqrt(pow(p1[0]-p2[0],2.0)+pow(p1[1]-p2[1],2.0)+pow(p1[2]-p2[2],2.0));
+  }
+  return dist;
+}
+
+// void InitParams();
 void InitConf();
-void ComputeAccel();
+// void ComputeAccel();
 void ComputeAcceleration();
 void SingleStep();
 void HalfKick();
 void ApplyBoundaryCond();
-void EvalProps();
+// void EvalProps();
 
 void animate(void);
-// void changeView(void);
+// void moveAtom(void);
 
 float * mapVelocityToColor();
 
 /*----------------------------------------------------------------------------*/
-void InitParams() {
-/*------------------------------------------------------------------------------
-	Initializes parameters.
-------------------------------------------------------------------------------*/
-	int k;
-	double rr,ri2,ri6,r1;
+// void InitParams() {
+// /*------------------------------------------------------------------------------
+// 	Initializes parameters.
+// ------------------------------------------------------------------------------*/
+// 	int k;
+// 	double rr,ri2,ri6,r1;
 
-	/* Reads control parameters */
-	scanf("%d%d%d",&InitUcell[0],&InitUcell[1],&InitUcell[2]);
-	scanf("%le",&Density);
-	scanf("%le",&InitTemp);
-	scanf("%le",&DeltaT);
-	scanf("%d",&StepLimit);
-	scanf("%d",&StepAvg);
+// 	/* Reads control parameters */
+// 	// scanf("%d%d%d",&InitUcell[0],&InitUcell[1],&InitUcell[2]);
+// 	// scanf("%le",&Density);
+// 	// scanf("%le",&InitTemp);
+// 	// scanf("%le",&DeltaT);
+// 	// scanf("%d",&StepLimit);
+// 	// scanf("%d",&StepAvg);
 
-	/* Computes basic parameters */
-	DeltaTH = 0.5*DeltaT;
-	for (k=0; k<3; k++) {
-		Region[k] = InitUcell[k]/pow(Density/4.0,1.0/3.0);
-		RegionH[k] = 0.5*Region[k];
+// 	/* Computes basic parameters */
+// 	DeltaTH = 0.5*DeltaT;
+// 	for (k=0; k<3; k++) {
+// 		Region[k] = InitUcell[k]/pow(Density/4.0,1.0/3.0);
+// 		RegionH[k] = 0.5*Region[k];
 
-    // printf("REGION: %f\n", Region[k]);
-	}
+//     // printf("REGION: %f\n", Region[k]);
+// 	}
 
 
 
-	/* Constants for potential truncation */
-	rr = RCUT*RCUT; ri2 = 1.0/rr; ri6 = ri2*ri2*ri2; r1=sqrt(rr);
-	Uc = 4.0*ri6*(ri6 - 1.0);
-	Duc = -48.0*ri6*(ri6 - 0.5)/r1;
-}
+// 	/* Constants for potential truncation */
+// 	rr = RCUT*RCUT; ri2 = 1.0/rr; ri6 = ri2*ri2*ri2; r1=sqrt(rr);
+// 	Uc = 4.0*ri6*(ri6 - 1.0);
+// 	Duc = -48.0*ri6*(ri6 - 0.5)/r1;
+// }
 
 /*----------------------------------------------------------------------------*/
 void InitConf() {
@@ -106,18 +126,18 @@ void InitConf() {
 	r are initialized to face-centered cubic (fcc) lattice positions.  
 	rv are initialized with a random velocity corresponding to Temperature.  
 ------------------------------------------------------------------------------*/
-	double c[3],gap[3],e[3],vSum[3],vMag;
+	// double c[3],gap[3],e[3],vSum[3],vMag;
 
-  double rLoc; 
+  // double rLoc; 
 
-	int j,n,k,nX,nY,nZ;
-	double seed;
+	int j,n,k;
+	double seed, e[3];
 	/* FCC atoms in the original unit cell */
-	double origAtom[4][3] = {{0.0, 0.0, 0.0}, {0.0, 0.5, 0.5},
-	                         {0.5, 0.0, 0.5}, {0.5, 0.5, 0.0}}; 
+	// double origAtom[4][3] = {{0.0, 0.0, 0.0}, {0.0, 0.5, 0.5},
+	//                          {0.5, 0.0, 0.5}, {0.5, 0.5, 0.0}}; 
 
 	/* Sets up a face-centered cubic (fcc) lattice */
-	for (k=0; k<3; k++) gap[k] = Region[k]/InitUcell[k];
+	// for (k=0; k<3; k++) gap[k] = Region[k]/InitUcell[k];
 
   // printf("The gap is: %f, %f, %f \n", gap[0], gap[1], gap[2]);
 
@@ -133,7 +153,7 @@ void InitConf() {
   // }
 
 
-  int nAtomTotal = 300;
+  int nAtomTotal = 50;
   nAtom= 0;
   for (int i = 0; i<nAtomTotal;i++){
     // printf("In first loop\n");
@@ -173,80 +193,82 @@ void InitConf() {
 
 	/* Generates random velocities */
 	seed = 13597.0;
-	vMag = sqrt(3*InitTemp);
-	for(k=0; k<3; k++) vSum[k] = 0.0;
+	// vMag = sqrt(3*InitTemp);
+	// for(k=0; k<3; k++) vSum[k] = 0.0;
 	for(n=0; n<nAtom; n++) {
 		RandVec3(e,&seed);
 		for (k=0; k<3; k++) {
-			rv[n][k] = vMag*e[k];
+			rv[n][k] = 20*e[k];
       // rv[n][k] = ((float)rand()/(float)(RAND_MAX)) * 10.0;
       // printf("rv[n][k] = %f\n", rv[n][k]);
-			vSum[k] = vSum[k] + rv[n][k];
+			// vSum[k] = vSum[k] + rv[n][k];
 		}
 	}
 	/* Makes the total momentum zero */
-	for (k=0; k<3; k++) vSum[k] = vSum[k]/nAtom;
-	for (n=0; n<nAtom; n++) for(k=0; k<3; k++) rv[n][k] = rv[n][k] - vSum[k];
+	// for (k=0; k<3; k++) vSum[k] = vSum[k]/nAtom;
+	// for (n=0; n<nAtom; n++) for(k=0; k<3; k++) rv[n][k] = rv[n][k] - vSum[k];
 }
 
 void ComputeAcceleration() {
   int n,k;
+
   for (n=0; n<nAtom; n++) {
 
+    if (n != clickedAtom) {
 
-
-    ra[n][0] = 0;
-    ra[n][1] = -19.81;
-    // ra[n][1] = 0;
-    ra[n][2] = 0;
+      ra[n][0] = 0;
+      ra[n][1] = gravity;
+      // ra[n][1] = 0;
+      ra[n][2] = 0;
+    }
 
     // printf("In acceleration, position is: %f, %f, %f\n", r[n][0], r[n][1], r[n][2]);
   }
 
 }
 
-/*----------------------------------------------------------------------------*/
-void ComputeAccel() {
-/*------------------------------------------------------------------------------
-	Acceleration, ra, are computed as a function of atomic coordinates, r,
-	using the Lennard-Jones potential.  The sum of atomic potential energies,
-	potEnergy, is also computed.   
-------------------------------------------------------------------------------*/
-	double dr[3],f,fcVal,rrCut,rr,ri2,ri6,r1;
-	int j1,j2,n,k;
+// /*----------------------------------------------------------------------------*/
+// void ComputeAccel() {
+// /*------------------------------------------------------------------------------
+// 	Acceleration, ra, are computed as a function of atomic coordinates, r,
+// 	using the Lennard-Jones potential.  The sum of atomic potential energies,
+// 	potEnergy, is also computed.   
+// ------------------------------------------------------------------------------*/
+// 	double dr[3],f,fcVal,rrCut,rr,ri2,ri6,r1;
+// 	int j1,j2,n,k;
 
-	rrCut = RCUT*RCUT;
-	for (n=0; n<nAtom; n++) for (k=0; k<3; k++) ra[n][k] = 0.0;
-	potEnergy = 0.0;
+// 	rrCut = RCUT*RCUT;
+// 	for (n=0; n<nAtom; n++) for (k=0; k<3; k++) ra[n][k] = 0.0;
+// 	potEnergy = 0.0;
 
-	/* Doubly-nested loop over atomic pairs */
-	for (j1=0; j1<nAtom-1; j1++) {
-		for (j2=j1+1; j2<nAtom; j2++) {
-			/* Computes the squared atomic distance */
-			for (rr=0.0, k=0; k<3; k++) {
-				dr[k] = r[j1][k] - r[j2][k];
-				/* Chooses the nearest image */
-				dr[k] = dr[k] - SignR(RegionH[k],dr[k]-RegionH[k])
-				              - SignR(RegionH[k],dr[k]+RegionH[k]);
-				rr = rr + dr[k]*dr[k];
-			}
-			/* Computes acceleration & potential within the cut-off distance */
-			if (rr < rrCut) {
-				ri2 = 1.0/rr; 
-        ri6 = ri2*ri2*ri2; 
-        r1 = sqrt(rr);
-				fcVal = 48.0*ri2*ri6*(ri6-0.5) + Duc/r1;
-				for (k=0; k<3; k++) {
-					f = fcVal*dr[k];
-					ra[j1][k] = ra[j1][k] + f;
-					ra[j2][k] = ra[j2][k] - f;
-				}
-				potEnergy = potEnergy + 4.0*ri6*(ri6-1.0) - Uc - Duc*(r1-RCUT);
-			} 
-		} 
-    // ra[j1][1]+= -9.81;  // Add gravity
-	}
-}
+// 	/* Doubly-nested loop over atomic pairs */
+// 	for (j1=0; j1<nAtom-1; j1++) {
+// 		for (j2=j1+1; j2<nAtom; j2++) {
+// 			/* Computes the squared atomic distance */
+// 			for (rr=0.0, k=0; k<3; k++) {
+// 				dr[k] = r[j1][k] - r[j2][k];
+// 				/* Chooses the nearest image */
+// 				dr[k] = dr[k] - SignR(RegionH[k],dr[k]-RegionH[k])
+// 				              - SignR(RegionH[k],dr[k]+RegionH[k]);
+// 				rr = rr + dr[k]*dr[k];
+// 			}
+// 			/* Computes acceleration & potential within the cut-off distance */
+// 			if (rr < rrCut) {
+// 				ri2 = 1.0/rr; 
+//         ri6 = ri2*ri2*ri2; 
+//         r1 = sqrt(rr);
+// 				fcVal = 48.0*ri2*ri6*(ri6-0.5) + Duc/r1;
+// 				for (k=0; k<3; k++) {
+// 					f = fcVal*dr[k];
+// 					ra[j1][k] = ra[j1][k] + f;
+// 					ra[j2][k] = ra[j2][k] - f;
+// 				}
+// 				potEnergy = potEnergy + 4.0*ri6*(ri6-1.0) - Uc - Duc*(r1-RCUT);
+// 			} 
+// 		} 
+//     // ra[j1][1]+= -9.81;  // Add gravity
+// 	}
+// }
 
 /*----------------------------------------------------------------------------*/
 void SingleStep() {
@@ -260,7 +282,7 @@ void SingleStep() {
 		for (k=0; k<3; k++) r[n][k] = r[n][k] + DeltaT*rv[n][k];
 	ApplyBoundaryCond();
 	// ComputeAccel(); /* Computes new accelerations, a(t+Dt) */
-  // ComputeAcceleration();
+  ComputeAcceleration();
 	HalfKick(); /* Second half kick to obtain v(t+Dt) */
 }
 
@@ -273,11 +295,15 @@ void HalfKick() {
 	// for (n=0; n<nAtom; n++)
 	// 	for (k=0; k<3; k++) rv[n][k] = rv[n][k] + DeltaTH*ra[n][k];
 
+  DeltaTH = 0.5*DeltaT;
+
   int n,k;
 	for (n=0; n<nAtom; n++) {
 		for (k=0; k<3; k++) {
        rv[n][k] = rv[n][k] + DeltaTH*ra[n][k];
-      //  printf("DeltaTH: %f, accel: %f, velocity:%f\n", DeltaTH, ra[n][k], rv[n][k]);
+
+      //  if (n == clickedAtom)
+      //     printf("For atom %d, DeltaTH: %f, accel: %f, velocity:%f\n", n, DeltaTH, ra[n][k], rv[n][k]);
     }
   }
 
@@ -316,13 +342,13 @@ void ApplyBoundaryCond() {
   int toPrint = 0;
   // float collisionDamping = 1;
   // float collisionDamping = 0.5;
-  float collisionDamping = 0.8;
+  // float collisionDamping = 0.8;
   // float collisionDamping = 0.95;
 
 	for (n=0; n<nAtom; n++) {
     // if (r[n][0] > 5.129928 || r[n][1] > 5.129928 || r[n][2] > 5.129928 ||
     //   r[n][0] < 0 || r[n][1] < 0 || r[n][2] < 0){
-    //   printf("Position Before Boundary condition: %f, %f, %f\n", r[n][0], r[n][1], r[n][2]);
+      // printf("Position Before Boundary condition: %f, %f, %f\n", r[n][0], r[n][1], r[n][2]);
     //   toPrint = 1;
     // }
 
@@ -410,11 +436,19 @@ void ApplyBoundaryCond() {
           for (k=0; k<3; k++)  {
             norm[k] = r[n][k] - r[n2][k];
             norm_sum += pow(norm[k],2);
-            relative_v[k] = rv[n][k] - rv[n2][k];
+
+            if (n == clickedAtom)
+              relative_v[k] = clickedAtomNewVelocity[k] - rv[n2][k];
+            else if (n2 == clickedAtom)
+              relative_v[k] = rv[n][k] - clickedAtomNewVelocity[k];
+            else
+              relative_v[k] = rv[n][k] - rv[n2][k];
           }
           for (k=0; k<3; k++)  {
             norm[k] = norm[k] / sqrt(norm_sum);
           }
+
+          
 
 
 
@@ -497,46 +531,47 @@ void ApplyBoundaryCond() {
           // printf("dot_scalar_norm = %Lf,%Lf,%Lf  \n", dot_scalar_norm[0], dot_scalar_norm[1], dot_scalar_norm[2]);
 
 
-          double velocity_error[3];
-          for (k=0; k<3; k++)  {
-            long double rvn_old = rv[n][k];
-            long double rvn2_old = rv[n2][k];
+          // TODO: Add in logic so that if one of the collision atoms is being clicked, only the other
+          // atom get the velocity transfer
 
-            rv[n][k] = (rv[n][k] - dot_scalar_norm[k]) * collisionDamping;
-            rv[n2][k] = (rv[n2][k] + dot_scalar_norm[k]) * collisionDamping;
+          // double velocity_error[3];
 
-            // ra[n][k] = (rv[n][k] - rvn_old)/DeltaT;
-            // ra[n][1] = ra[n][1] - 9.81;
-            // ra[n2][k] = (rv[n2][k] - rvn2_old)/DeltaT;
-            // ra[n][1] = ra[n2][1] - 9.81;
-
-
-            velocity_error[k] = (rvn_old + rvn2_old) - (rv[n][k] + rv[n2][k]);
+          if (n == clickedAtom) {
+            // printf("Atom n (%d) is the clicked atom and velocity is %f,%f,%f\n", n, clickedAtomNewVelocity[0], clickedAtomNewVelocity[1], clickedAtomNewVelocity[2]);
+            // printf("Atom n2 (%d) is the other atom and velocity is %f,%f,%f\n", n2, rv[n2][0], rv[n2][1], rv[n2][2]);
+            // printf("dot_scalar_norm = %Lf,%Lf,%Lf \n", dot_scalar_norm[0], dot_scalar_norm[1], dot_scalar_norm[2]);
+            for (k=0; k<3; k++)  {
+              rv[n2][k] = (rv[n2][k] + dot_scalar_norm[k]) * collisionDamping;
+            }
+            // printf("Atom n2 (%d) new velocity is %f,%f,%f\n", n2, rv[n2][0], rv[n2][1], rv[n2][2]);
             
           }
+          else if (n2 == clickedAtom) {
+            // printf("Atom n2 (%d) is the clicked atom and velocity is %f,%f,%f\n", n2, clickedAtomNewVelocity[0], clickedAtomNewVelocity[1], clickedAtomNewVelocity[2]);
+            // printf("Atom n (%d) is the other atom and velocity is %f,%f,%f\n", n, rv[n][0], rv[n][1], rv[n][2]);
+            for (k=0; k<3; k++)  {
+              
+              rv[n][k] = (rv[n][k] - dot_scalar_norm[k]) * collisionDamping;
+            }
+            // printf("Atom n (%d) new velocity is %f,%f,%f\n", n, rv[n][0], rv[n][1], rv[n][2]);
+          }
+                  
 
-          // printf("Particle %d has NEW velocity %f,%f,%f  \n", n, rv[n][0], rv[n][1], rv[n][2]);
-          
-          // rv[n][0] += velocity_error[0];
-          // rv[n][1] += velocity_error[1];
-          // rv[n][2] += velocity_error[2];
+          else {
+            for (k=0; k<3; k++)  {
+              long double rvn_old = rv[n][k];
+              long double rvn2_old = rv[n2][k];
 
-          // printf("velocity_error = %f,%f,%f\n", velocity_error[0], velocity_error[1], velocity_error[2]);
+              rv[n][k] = (rv[n][k] - dot_scalar_norm[k]) * collisionDamping;
+              rv[n2][k] = (rv[n2][k] + dot_scalar_norm[k]) * collisionDamping;
 
-           
 
-          // printf("rv[n][k] = %f,%f,%f  \n", rv[n][0], rv[n][1], rv[n][2]);
-          // printf("rv[n2][k] = %f,%f,%f  \n", rv[n2][0], rv[n2][1], rv[n2][2]);
+              // velocity_error[k] = (rvn_old + rvn2_old) - (rv[n][k] + rv[n2][k]);
+              
+            }
+          }
 
-          // double rv_sum = 0;
-          // for (k=0; k<3; k++)  {
-          //   norm[k] = r[n][k] - r[n2][k];
-          //   rv_sum += pow(norm[k],2);
-          //   relative_v[k] = rv[n][k] - rv[n2][k];
-          // }
-          // for (k=0; k<3; k++)  {
-          //   norm[k] = norm[k] / sqrt(norm_sum);
-          // }
+
 
           rv_mag = sqrt(pow(rv[n][0],2.0)+pow(rv[n][1],2.0)+pow(rv[n][2],2.0));
           // printf("rv_mag = %f\n", rv_mag);
@@ -557,162 +592,365 @@ void ApplyBoundaryCond() {
             rv[n2][2] = 0;
           }
 
-          // double rv_mag2 = sqrt(pow(rv[n2][0],2.0)+pow(rv[n2][1],2.0)+pow(rv[n2][2],2.0));
-          // printf("rv_mag2 = %f\n", rv_mag2);
-
-
-          // Add some logic here that checks if the new position will shove the ball outside the bounds
-
-          // double new_rv[3];
-          // double new_rv2[3];
-          // double newPos1[3];
-          // double newPos2[3];
-
-          // new_rv[0] = (2*atom_radius - dst)*(rv[n][0]/rv_mag);
-          // new_rv[1] = (2*atom_radius - dst)*(rv[n][1]/rv_mag);
-          // new_rv[2] = (2*atom_radius - dst)*(rv[n][2]/rv_mag);
-
-          // newPos1[0] = r[n][0] + new_rv[0];
-          // newPos1[1] = r[n][1] + new_rv[1];
-          // newPos1[2] = r[n][2] + new_rv[2];
-
-
-          // new_rv2[0] = (2*atom_radius - dst)*(rv[n2][0]/rv_mag2);
-          // new_rv2[1] = (2*atom_radius - dst)*(rv[n2][1]/rv_mag2);
-          // new_rv2[2] = (2*atom_radius - dst)*(rv[n2][2]/rv_mag2);
-
-          // newPos2[0] = r[n2][0] + new_rv2[0];
-          // newPos2[1] = r[n2][1] + new_rv2[1];
-          // newPos2[2] = r[n2][2] + new_rv2[2];
-
-          // printf("REGION: %f,%f,%f\n", Region[0], Region[1], Region[2]);
-          // printf("New position 1 would be = %f,%f,%f\n", newPos1[0], newPos1[1], newPos1[2]);
-          // printf("New position 2 would be = %f,%f,%f\n", newPos2[0], newPos2[1], newPos2[2]);
-
-          // for (k=0; k<3; k++)  {
-          //   if (newPos1[k] > Region[k] || newPos1[k] < 0) {
-          //     new_rv2[k] = (2*atom_radius - dst)*(rv[n2][k]/rv_mag2);
-
-          //     r[n2][k] += new_rv2[k];
-
-          //   }
-          //   else {
-          //     r[n][k] += new_rv[k];
-          //   }
-          // }
-
-          // r[n][0] += (2*atom_radius - dst)*(rv[n][0]/rv_mag);
-          // r[n][1] += (2*atom_radius - dst)*(rv[n][1]/rv_mag);
-          // r[n][2] += (2*atom_radius - dst)*(rv[n][2]/rv_mag);
-
-          // double new_rv_mag = sqrt(pow(new_rv[0],2.0)+pow(new_rv[1],2.0)+pow(new_rv[2],2.0));
-          // printf("new_rv_mag = %f\n", new_rv_mag);
-
-          // new_rv2[0] = (2*atom_radius - dst/2.0)*(rv[n2][0]/rv_mag2);
-          // new_rv2[1] = (2*atom_radius - dst/2.0)*(rv[n2][1]/rv_mag2);
-          // new_rv2[2] = (2*atom_radius - dst/2.0)*(rv[n2][2]/rv_mag2);
-
-          // r[n2][0] += new_rv2[0];
-          // r[n2][1] += new_rv2[1];
-          // r[n2][2] += new_rv2[2];
-
-          // r[n][0] += (2*atom_radius - dst)*(rv[n][0]/rv_mag);
-          // r[n][1] += (2*atom_radius - dst)*(rv[n][1]/rv_mag);
-          // r[n][2] += (2*atom_radius - dst)*(rv[n][2]/rv_mag);
-
-          // double new_rv_mag2 = sqrt(pow(new_rv2[0],2.0)+pow(new_rv2[1],2.0)+pow(new_rv2[2],2.0));
-          // printf("new_rv_mag2 = %f\n", new_rv_mag2);
-
-
-          // printf("Particle %d has NEW position %f,%f,%f and NEW velocity %f,%f,%f  \n", n, r[n][0], r[n][1], r[n][2], rv[n][0], rv[n][1], rv[n][2]);
-          // printf("Particle %d has NEW position %f,%f,%f and NEW velocity %f,%f,%f  \n\n", n2, r[n2][0], r[n2][1], r[n2][2], rv[n2][0], rv[n2][1], rv[n2][2]);
-
-
-
-
-          // long double newdst = sqrt(pow(r[n][0]-r[n2][0],2.0)+pow(r[n][1]-r[n2][1],2.0)+pow(r[n][2]-r[n2][2],2.0));
-          // printf("Particles %d and %d new distance %Lf \n\n", n, n2, newdst);
-          
-
         }
       
       }
 
-      
-
-    // }
-
-
-
-
-
-    // if (toPrint == 1){
-    //   printf("Position After Boundary condition:   %f, %f, %f\n", r[n][0], r[n][1], r[n][2]);
-    //   printf("Velocity After Boundary condition:   %f, %f, %f\n", rv[n][0], rv[n][1], rv[n][2]);
-      
-    //   toPrint = 0;
-    // }
   }
-
-  // double totSystemSpeed[3];
-  // // for (n=0; n<nAtom; n++) {
-  //   for (k=0; k<3; k++) {
-  //     totSystemSpeed[k] = 0;
-  //   }
-  // // }
-
-  // for (n=0; n<nAtom; n++) {
-  //   for (k=0; k<3; k++) {
-  //     totSystemSpeed[k] += fabs(rv[n][k]);
-
-  //     if (fabs(rv_init[n][k]) != fabs(rv[n][k]))
-  //       printf("Particle %d speed changed: \n rv_init[%d][%d] = %f\n rv[%d][%d] = %f\n", n, n, k, rv_init[n][k],n,k,rv[n][k]);
-  //   }
-  // }
-
-  // printf("\nTotal system speed start: %f,%f,%f = %f \n\n", totSystemSpeedStart[0], totSystemSpeedStart[1], totSystemSpeedStart[2], (totSystemSpeedStart[0] + totSystemSpeedStart[1] + totSystemSpeedStart[2]));
-  // printf("\nTotal system speed end: %f,%f,%f = %f \n\n", totSystemSpeed[0], totSystemSpeed[1], totSystemSpeed[2], (totSystemSpeed[0] + totSystemSpeed[1] + totSystemSpeed[2]));
-
 }
 
-/*----------------------------------------------------------------------------*/
-void EvalProps() {
-/*------------------------------------------------------------------------------
-	Evaluates physical properties: kinetic, potential & total energies.
-------------------------------------------------------------------------------*/
-	double vv;
-	int n,k;
 
-	kinEnergy = 0.0;
-	for (n=0; n<nAtom; n++) {
-		vv = 0.0;
-		for (k=0; k<3; k++)
-			vv = vv + rv[n][k]*rv[n][k];
-		kinEnergy = kinEnergy + vv;
-	}
-	kinEnergy *= (0.5/nAtom);
-	potEnergy /= nAtom;
-	totEnergy = kinEnergy + potEnergy;
-	temperature = kinEnergy*2.0/3.0;
+// /*----------------------------------------------------------------------------*/
+// void EvalProps() {
+// /*------------------------------------------------------------------------------
+// 	Evaluates physical properties: kinetic, potential & total energies.
+// ------------------------------------------------------------------------------*/
+// 	double vv;
+// 	int n,k;
 
-	/* Print the computed properties */
-	// printf("%9.6f %9.6f %9.6f %9.6f\n",
-	// stepCount*DeltaT,temperature,potEnergy,totEnergy);
-}
+// 	kinEnergy = 0.0;
+// 	for (n=0; n<nAtom; n++) {
+// 		vv = 0.0;
+// 		for (k=0; k<3; k++)
+// 			vv = vv + rv[n][k]*rv[n][k];
+// 		kinEnergy = kinEnergy + vv;
+// 	}
+// 	kinEnergy *= (0.5/nAtom);
+// 	potEnergy /= nAtom;
+// 	totEnergy = kinEnergy + potEnergy;
+// 	temperature = kinEnergy*2.0/3.0;
+
+// 	/* Print the computed properties */
+// 	// printf("%9.6f %9.6f %9.6f %9.6f\n",
+// 	// stepCount*DeltaT,temperature,potEnergy,totEnergy);
+// }
 
 void animate() { /* Callback function for idle events */
     /* Keep updating the scene until the last MD step is reached */
     if (stepCount <= StepLimit) {
         SingleStep(); /* One MD-step integration */
-        if (stepCount%StepAvg == 0) EvalProps(); 
+        // if (stepCount%StepAvg == 0) EvalProps(); 
         makeCurframeGeom(); /* Redraw the scene (make a display list) */
         glutPostRedisplay(); 
         ++stepCount;
     }
 }
 
-void changeView(int x, int y) {
-  printf("changeView function being triggered: x = %d, y = %d \n", x, y);
+void mouseClick(int button, int state, int x, int y){
+  // printf("Mouse was clicked\n");
+  // printf("button = %d, state = %d, x = %d, y = %d\n", button, state, x, y);
+
+  // Mouse unclicked so turn gravity back on for particle that was held and set velocity
+  if (state) {
+    if (clickedAtom > -1) {
+      
+      
+
+      // printf("Resetting velocity to be: %f,%f,%f \n", clickedAtomNewVelocity[0], clickedAtomNewVelocity[1], clickedAtomNewVelocity[2]);
+      for (int k =0; k<3;k++){
+        
+        rv[clickedAtom][k] = clickedAtomNewVelocity[k];
+      }
+
+      ra[clickedAtom][1] = gravity;
+
+      // Reset clickedAtom
+      clickedAtom = -1;
+    }
+  }
+
+  else if (state == 0) {
+    double modelMatrix[16];
+    double projMatrix[16];
+    GLint viewport[4];
+    GLdouble mouseVec_start[3];
+    GLdouble mouseVec_end[3];
+
+    clickedAtom = -1;
+
+    glGetIntegerv( GL_VIEWPORT, viewport );
+    glGetDoublev( GL_MODELVIEW_MATRIX, modelMatrix );
+    glGetDoublev( GL_PROJECTION_MATRIX, projMatrix );
+    GLint realy = viewport[3] - (GLint) y;
+    gluUnProject( (GLdouble) x, (GLdouble) realy, 0.0, modelMatrix,
+        projMatrix, viewport, &mouseVec_start[0], &mouseVec_start[1], &mouseVec_start[2] );
+    gluUnProject( (GLdouble) x, (GLdouble) realy, 1.0, modelMatrix,
+        projMatrix, viewport, &mouseVec_end[0], &mouseVec_end[1], &mouseVec_end[2] );
+
+    // printf("mouseVec_start = %f, %f,%f \n", mouseVec_start[0], mouseVec_start[1], mouseVec_start[2]);
+    // printf("mouseVec_end = %f,%f,%f \n", mouseVec_end[0], mouseVec_end[1], mouseVec_end[2]);
+
+    double mouseVec[3];
+    for (int k=0; k <3;k++){
+      mouseVec[k] = mouseVec_end[k] - mouseVec_start[k];
+    }  
+
+    double mouseVec_square = dot_product(mouseVec, mouseVec, 3); 
+
+    // printf("mouseVec = %f,%f,%f \n", mouseVec[0], mouseVec[1], mouseVec[2]);
+
+    double mouseStart_toAtom[3];
+    double mouseVect_mouseAtomVec_dot[3];
+    double mousePoint_mouseVect_proj[3];
+    double closestPoint[3];
+    int mouseRayAtomCollision = 0;
+
+    for (int n=0; n<nAtom; n++) {
+      for (int k=0; k <3;k++){
+        mouseStart_toAtom[k] = r[n][k] - mouseVec_start[k];
+      }
+
+      double mouseVect_mouseAtomVec_dot = dot_product(mouseStart_toAtom, mouseVec, 3); 
+
+      for (int k=0; k <3;k++){
+        mousePoint_mouseVect_proj[k] = mouseVect_mouseAtomVec_dot / mouseVec_square;
+      }
+
+      for (int k=0; k <3;k++){
+        closestPoint[k] = mouseVec_start[k] + mouseVec[k] * mousePoint_mouseVect_proj[k];
+      }
+
+      // printf("closestPoint = %f,%f,%f\n", closestPoint[0], closestPoint[1], closestPoint[2]);
+
+      double len = distance(closestPoint, r[n], 3); 
+
+      // printf("len = %f\n", len);
+
+      mouseRayAtomCollision = 0;
+      double epsilon = 0.01;
+      if (len < atom_radius + epsilon) {
+        mouseRayAtomCollision = 1;
+        clickedAtom = n;
+        break;
+        
+      }
+
+    }
+
+    if (mouseRayAtomCollision) {
+      // printf("The mouse is grabbing particle %d\n", clickedAtom);
+      for(int k=0; k<3;k++) {
+        rv[clickedAtom][k] = 0;
+        ra[clickedAtom][k] = 0;
+      }
+    }
+    // else
+      // printf("The mouse is not grabbing any particle\n");
+  }
+
+
+
+    // Vec3d AP = P - A; 
+    // double ap_dot_ab = DotProduct(AP, AB); 
+    // // t is a projection param when we project vector AP onto AB 
+    // *t = ap_dot_ab / ab_square; 
+    // // calculate the closest point 
+    // Vec3d Q = A + AB * (*t); 
+
+
+
+  // int n;
+  // int k;
+
+  // double minX = 100;
+  // double minY = 100;
+  // double minDist = 100;
+  // int closestAtom;
+
+  // double new_x = x / (winx/2.0) - 1.0 ;
+  // double new_y = -1 * (y / (winy/2.0) - 1.0);
+
+  // printf("new_x = %f, new_y = %f \n", new_x, new_y);
+
+
+  // for (n=0; n<nAtom; n++) {
+  //   double xdiff = r[n][0] - x;
+  //   double ydiff = r[n][1] - y;
+  //   double dist = sqrt(pow(xdiff, 2) + pow(ydiff, 2));
+  //    if (dist < minDist) {
+  //     closestAtom = n;
+  //    }
+  // }
+
+  // printf("closes atom is number %d with position: %f,%f,%f\n", closestAtom, r[closestAtom][0], r[closestAtom][1], r[closestAtom][2]);
+}
+
+
+void moveAtom(int x, int y) {
+
+  double atomStartPos[3];
+
+
+  if (clickedAtom > -1) {
+
+    // TIMER  //
+    struct timeval t1, t2;
+    double elapsedTime;
+
+    // start timer
+    gettimeofday(&t1, NULL);
+
+    double modelMatrix[16];
+    double projMatrix[16];
+    GLint viewport[4];
+    GLdouble mouseVec_start[3];
+    GLdouble mouseVec_end[3];
+
+    glGetIntegerv( GL_VIEWPORT, viewport );
+    glGetDoublev( GL_MODELVIEW_MATRIX, modelMatrix );
+    glGetDoublev( GL_PROJECTION_MATRIX, projMatrix );
+    GLint realy = viewport[3] - (GLint) y;
+    gluUnProject( (GLdouble) x, (GLdouble) realy, 0.0, modelMatrix,
+        projMatrix, viewport, &mouseVec_start[0], &mouseVec_start[1], &mouseVec_start[2] );
+    gluUnProject( (GLdouble) x, (GLdouble) realy, 1.0, modelMatrix,
+        projMatrix, viewport, &mouseVec_end[0], &mouseVec_end[1], &mouseVec_end[2] );
+
+    // printf("mouseVec_start = %f, %f,%f \n", mouseVec_start[0], mouseVec_start[1], mouseVec_start[2]);
+    // printf("mouseVec_end = %f,%f,%f \n", mouseVec_end[0], mouseVec_end[1], mouseVec_end[2]);
+
+    double mouseVec[3];
+    double newLoc[3];
+
+    for (int k=0; k <3;k++){
+      mouseVec[k] = mouseVec_end[k] - mouseVec_start[k];
+    }  
+
+    // printf("Currently grabbed particle position: %f,%f,%f \n", r[clickedAtom][0], r[clickedAtom][1], r[clickedAtom][2]);
+
+    GLdouble obj_win_coord[3];
+    gluProject(r[clickedAtom][0], r[clickedAtom][1], r[clickedAtom][2], modelMatrix,
+        projMatrix, viewport, &obj_win_coord[0], &obj_win_coord[1], &obj_win_coord[2]);
+
+    // printf("Obj pos in win space is %f,%f,%f \n", obj_win_coord[0], obj_win_coord[1], obj_win_coord[2]);
+
+
+    gluUnProject( (GLdouble) x, (GLdouble) realy, obj_win_coord[2], modelMatrix,
+        projMatrix, viewport, &newLoc[0], &newLoc[1], &newLoc[2] );
+
+    
+    for(int k =0; k <3;k++){
+      atomStartPos[k] = r[clickedAtom][k];
+      r[clickedAtom][k]= newLoc[k];
+    }
+
+
+
+    // stop timer
+    gettimeofday(&t2, NULL);
+
+    // compute and print the elapsed time in millisec
+    elapsedTime = (t2.tv_sec - t1.tv_sec) * 1000.0;      // sec to ms
+    elapsedTime += (t2.tv_usec - t1.tv_usec) / 1000.0;   // us to ms
+    // printf("%f ms.\n", elapsedTime);
+
+    // Get velocity
+    double vel[3];
+    for(int k =0; k <3;k++){
+        clickedAtomNewVelocity[k] = (r[clickedAtom][k] - atomStartPos[k]) / (elapsedTime);
+
+    }
+
+  }
+
+}
+
+void MyKeyboardFunc(unsigned char Key, int x, int y)
+{
+  // printf("Key pressed: %c \n", Key);
+
+  switch(Key)
+  {
+    case 'g': // Add to gravity value
+      gravity += 10;
+      printf("gravity value is now %f \n", gravity);
+      break;
+    case 'h': // Subtract from gravity value
+      gravity -= 10;
+      printf("gravity value is now %f \n", gravity);
+      break;
+    case 'z': // Increase the size of the particles
+      atom_radius += 0.1; 
+      sphereid = glGenLists(1);
+      makeFastNiceSphere(sphereid,atom_radius);
+      makeAtoms();
+      break;
+    case 'x': // Reduce the size of the particles
+      atom_radius -= 0.1;
+      sphereid = glGenLists(1);
+      makeFastNiceSphere(sphereid,atom_radius);
+      makeAtoms();
+      break;
+    case 'c': // Add a particle to the system from top (or botton if gravity is flipped) with random downward velocity
+      nAtom++; 
+      r[nAtom-1][0]= ((double)rand()/(double)(RAND_MAX)) * Region[0];
+      r[nAtom-1][1]= Region[1];
+      r[nAtom-1][2]= ((double)rand()/(double)(RAND_MAX)) * Region[2];
+
+      if (gravity > 0)
+        r[nAtom-1][1]=r[nAtom-1][1]*-1;
+
+      rv[nAtom-1][1]= ((double)rand()/(double)(RAND_MAX)) * Region[1];
+
+      makeAtoms();
+      break;
+    case 'v': // Remove a particle from system
+      nAtom--; 
+      makeAtoms();
+      break;
+    case 'q': // Quit program
+      exit(1);
+      break;
+    case 'l': // Pan camera view clockwise
+      angle_delta = 0.1;
+      rotateCamera(angle_delta);
+    break;
+    case 'k': // Pan camera view counter-clockwise
+      angle_delta = -0.1;
+      rotateCamera(angle_delta);
+    break;
+    case 'd': // Decrease damping coefficient (<1 will make particles slow down with each collision)
+      if (collisionDamping - 0.1 > 0)
+        collisionDamping -= 0.1;
+        printf("New collisionDamping: %f\n", collisionDamping);
+    break;
+    case 'f': // Increase damping coefficient (>1 will make particles speed up with each collision)
+      if (collisionDamping + 0.1 <= 1.5)
+        collisionDamping += 0.1;
+        printf("New collisionDamping: %f\n", collisionDamping);
+    break;
+    case 'm': // Toggle on/off mapping the particle velocity to 3D color cube
+      mapVelToColor = !mapVelToColor;
+    break;
+    
+  };
+  glutPostRedisplay();
+}
+
+void rotateCamera (double delta) {
+  double thetaX = acos((eye[0] - center[0]) / camera_dist);
+  double thetaZ = asin((eye[2] - center[2]) / camera_dist);
+
+  if (thetaZ < 0)
+    thetaX *= -1;
+
+  if (thetaX + delta > PI && thetaX <= PI) {
+    thetaX = thetaX + delta;
+    thetaX = -1 * (2*PI - thetaX);
+  }
+  else {
+    thetaX = thetaX + delta;
+  }
+  
+  double newX = center[0] + camera_dist * cos(thetaX);
+  double newZ = center[2] + camera_dist * sin(thetaX);
+
+  eye[0] = newX;
+  eye[2] = newZ;
+
+  gluLookAt(
+  (GLdouble)eye[0],(GLdouble)eye[1],(GLdouble)eye[2],
+  (GLdouble)center[0],(GLdouble)center[1],(GLdouble)center[2],
+  (GLdouble)up[0],(GLdouble)up[1],(GLdouble)up[2]);
 }
 
 /**********************************************************************/
@@ -819,7 +1057,7 @@ void makeBoundaryLines(GLuint listid){
     
 
     glBegin(GL_LINES);
-      glLineWidth(20);
+      glLineWidth(50);
 
       glColor3f(0, 0, 1);
       glVertex3f(0, 0, 0);
@@ -863,12 +1101,69 @@ void makeBoundaryLines(GLuint listid){
       glVertex3f(Region[0], Region[1], Region[2]);
       glVertex3f(0, Region[1], Region[2]);
 
+      
+
     glEnd();
 
+    
     glEndList();
 
 
 }
+
+// void makeButtons(GLuint listid){
+
+//   double modelMatrix[16];
+//   double projMatrix[16];
+//   GLint viewport[4];
+//   GLdouble world_coord_v1[3];
+//   GLdouble world_coord_v2[3];
+//   GLdouble world_coord_v3[3];
+
+//   glGetIntegerv( GL_VIEWPORT, viewport );
+//   glGetDoublev( GL_MODELVIEW_MATRIX, modelMatrix );
+//   glGetDoublev( GL_PROJECTION_MATRIX, projMatrix );
+
+//   int x = 50; int y = 50;
+//   GLint realy = viewport[3] - (GLint) y;
+
+//   gluUnProject( (GLdouble) x, (GLdouble) realy, 0.0, modelMatrix,
+//         projMatrix, viewport, &world_coord_v1[0], &world_coord_v1[1], &world_coord_v1[2] );
+
+//   gluUnProject( (GLdouble) (x - 25), (GLdouble) (realy + 25), 0.0, modelMatrix,
+//         projMatrix, viewport, &world_coord_v2[0], &world_coord_v2[1], &world_coord_v2[2] );
+
+//   gluUnProject( (GLdouble) (x + 25) , (GLdouble) (realy + 25), 0.0, modelMatrix,
+//         projMatrix, viewport, &world_coord_v3[0], &world_coord_v3[1], &world_coord_v3[2] );
+
+
+//   printf("world_coord_v1: %f,%f,%f \n", world_coord_v1[0], world_coord_v1[1], world_coord_v1[2]);
+//   printf("world_coord_v2: %f,%f,%f \n", world_coord_v2[0], world_coord_v2[1], world_coord_v2[2]);
+//   printf("world_coord_v3: %f,%f,%f \n", world_coord_v3[0], world_coord_v3[1], world_coord_v3[2]);
+
+  
+//   glNewList(listid, GL_COMPILE);
+
+//   glBegin(GL_TRIANGLES);
+//     glColor3f(0,0,1);
+//     // glVertex3f( world_coord_v1[0], world_coord_v1[1], world_coord_v1[2] );
+//     // glVertex3f( world_coord_v2[0], world_coord_v2[1], world_coord_v2[2] );
+//     // glVertex3f( world_coord_v3[0], world_coord_v3[1], world_coord_v3[2] );
+//     glVertex3f( 3, 10.7, 22 );
+//     glVertex3f( 3.5, 10.7, 22 );
+//     glVertex3f( 3.25, 10.45, 22 );
+
+//   glEnd();
+
+
+    
+
+//   glEndList();
+
+//   // printf("world_coord_v1: %f,%f,%f \n", world_coord_v1[0], world_coord_v1[1], world_coord_v1[2]);
+//   // printf("world_coord_v2: %f,%f,%f \n", world_coord_v2[0], world_coord_v2[1], world_coord_v2[2]);
+//   // printf("world_coord_v3: %f,%f,%f \n", world_coord_v3[0], world_coord_v3[1], world_coord_v3[2]);
+// }
 
 
 
@@ -893,8 +1188,11 @@ void makeAtoms() {
       // printf(" Curent atom position: %f %f %f\n", r[i][0],r[i][1],r[i][2]);
 
     // colorVals = mapVelocityToColor(r[i][0],r[i][1],r[i][2]);
-    // colorVals = mapVelocityToColor(rv[i][0],rv[i][1],rv[i][2]);
-    // rval = colorVals[0]; gval = colorVals[1]; bval = colorVals[2];
+
+    if (mapVelToColor) {
+      colorVals = mapVelocityToColor(rv[i][0],rv[i][1],rv[i][2]);
+      rval = colorVals[0]; gval = colorVals[1]; bval = colorVals[2];
+    }
 
     glColor3f(rval,gval,bval);
     glCallList(sphereid);
@@ -905,10 +1203,47 @@ void makeAtoms() {
   // Draw boundary lines
   glCallList(boundsid);
 
+  // glPopMatrix();
+  // glPopMatrix();
+  // glPopMatrix();
+  // glPushMatrix();
+
+  // glTranslatef(0.5,0.5,0.5);
+  glCallList(buttonsid);
+  // glPushMatrix();
+  // glPushMatrix();
+  // glPushMatrix();
+  // glPopMatrix();
+
+
 
   glEndList();
 
 
+  // Try to do triangle
+  // double projMatrix[16];
+  // glGetDoublev( GL_PROJECTION_MATRIX, projMatrix );
+  // glPushMatrix();
+  // glPushMatrix();
+  // glTranslatef(0,0,0);
+// glMatrixMode(GL_PROJECTION);
+// gluOrtho2D(0,400,0,500);
+
+  // glColor3ub(255,255,0);  // yellow
+  // glBegin(GL_TRIANGLES);
+  // glColor3f(0.5,0,0);
+  // glVertex2f( -0.5, -0.5 );
+  // glVertex2f( 0.5, -0.5 );
+  // glVertex2f( 0, 0.5 );
+  // glPopMatrix();
+   
+
+    // glVertex2f(300.0,210.0);
+    // glVertex2f(340.0,215.0);
+    // glVertex2f(320.0,250.0);
+  // glEnd();
+
+  //  glMatrixMode(GL_MODELVIEW);
 
   // glNewList(boundsid, GL_COMPILE);
   // glCallList(boundsid);
@@ -981,6 +1316,7 @@ void display() {
   buffers and draws the atoms in the current frame.
 ***********************************************************************/
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glLoadIdentity();
   drawScene();
   glutSwapBuffers();
@@ -1025,7 +1361,10 @@ void initView (float *min_ext, float *max_ext) {
   eye[1] = center[1];
   eye[2] = center[2] + dis;
 
-  printf("eye = %f,%f,%f\n dis = %f\n", eye[0], eye[1], eye[2], dis);
+  camera_dist = dis;
+
+  // printf("eye = %f,%f,%f\n dis = %f\n", eye[0], eye[1], eye[2], dis);
+  // printf("center = %f,%f,%f\n", center[0], center[1], center[2]);
 
   up[0] = 0.0;
   up[1] = 1.0;
@@ -1051,7 +1390,7 @@ int main(int argc, char **argv) {
   glutInit(&argc, argv);
 
   /* Read atomic coordinates from an MD-configuration file */
-    InitParams();
+    // InitParams();
     InitConf();
     // ComputeAccel();
     ComputeAcceleration();
@@ -1064,7 +1403,7 @@ int main(int argc, char **argv) {
   /* Specify window size */
   glutInitWindowSize(winx, winy);
   /* Open window */
-  glutCreateWindow("Lennard-Jones Atoms");
+  glutCreateWindow("Colliding Particles");
 
   /* Initialize view */
   initView(min_ext, max_ext);
@@ -1073,7 +1412,10 @@ int main(int argc, char **argv) {
   glutDisplayFunc(display);
   glutReshapeFunc(reshape);
   glutIdleFunc(animate);
-  glutMotionFunc(changeView);
+
+  glutMotionFunc(moveAtom);
+  glutMouseFunc(mouseClick);
+  glutKeyboardFunc(MyKeyboardFunc);
 
   
 
@@ -1081,8 +1423,13 @@ int main(int argc, char **argv) {
   sphereid = glGenLists(1);
   makeFastNiceSphere(sphereid,atom_radius);
 
+  /* Draw boundary lines */
   boundsid = glGenLists(1);
   makeBoundaryLines(boundsid);
+
+  // /* Draw buttons */
+  // buttonsid = glGenLists(1);
+  // makeButtons(buttonsid);
   
   /* generate an OpenGL display list for the atoms' geometry */
   atomsid = glGenLists(1);
