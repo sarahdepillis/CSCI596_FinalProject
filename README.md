@@ -29,3 +29,8 @@ Interactive options:
 Assumptions
 ---------------
 - All particles are equal size and equal mass
+
+
+![rotating](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/6a4ac9f4-4230-40b4-9265-81f5b3888965)
+
+
