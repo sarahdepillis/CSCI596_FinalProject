@@ -33,14 +33,23 @@ Interactive options:
 
 
 Rotate View:
+
 ![rotating](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/ff2ef9e5-25e0-4979-8125-919f99506631)
+
 Click and Drag Particle:
-![drag_particle](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/f36ca340-3294-4c05-ac6b-576a76e2ee94)
+
+![drag_particle](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/70e36e10-b472-47da-8da0-371c0dcead61)
+
 Increase Gravity:
-![gravity_down](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/c6dd8a7b-ccfe-401f-b37a-ca2fd2ac151d)
+
+![gravity_down](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/9f99571b-fb04-4d85-ae7d-b3e58484eede)
+
 Decrease Gravity:
-![gravity_up](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/2753f6d9-15ea-4a01-9949-152ede65a6ef)
+
+![gravity_up](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/38cec86c-778a-4c75-938a-6bcf6491476a)
+
 Damping Coefficient Greater Than One:
+
 ![damping_coeeff_gt1](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/51d31f7d-d32d-44e2-b194-de3a5ab852f2)
 
 
