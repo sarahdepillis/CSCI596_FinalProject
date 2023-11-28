@@ -32,9 +32,15 @@ Interactive options:
 
 
 
-
+Rotate View:
 ![rotating](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/ff2ef9e5-25e0-4979-8125-919f99506631)
-
+Click and Drag Particle:
+![drag_particle](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/f36ca340-3294-4c05-ac6b-576a76e2ee94)
+Increase Gravity:
+![gravity_down](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/c6dd8a7b-ccfe-401f-b37a-ca2fd2ac151d)
+Decrease Gravity:
+![gravity_up](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/2753f6d9-15ea-4a01-9949-152ede65a6ef)
+Damping Coefficient Greater Than One:
 ![damping_coeeff_gt1](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/51d31f7d-d32d-44e2-b194-de3a5ab852f2)
 
 
