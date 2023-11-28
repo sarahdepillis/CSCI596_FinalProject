@@ -4,10 +4,14 @@ Colliding Particle System Simulator
 Compiling
 ---------------
 To compile mdv.c, type:
-cc -o mdv mdv.c -L/System/Library/Frameworks -framework GLUT -framework OpenGL -lm
+cc -o particle-collision particle-collision.c -L/System/Library/Frameworks -framework GLUT -framework OpenGL -lm
 
-To run mdv.c, type:
-./md
+To run particle-collision.c, type:
+./particle-collision
+
+Assumptions
+---------------
+- All particles are equal size and equal mass
 
 Usage
 ---------------
@@ -26,12 +30,10 @@ Interactive options:
 - 'f' increase damping coefficient
 - 'm' toggle on/off mapping the particle velocity to 3D color cube
 
-Assumptions
----------------
-- All particles are equal size and equal mass
 
 
 
-![rotating](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/42521c94-61dd-457f-82c8-56d5b8fe2b6f)
+
+![rotating](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/2a3eeddc-547e-48b8-b5e2-913c4cd0dd23)
 
 
