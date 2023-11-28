@@ -52,9 +52,10 @@ Add Particles:
 
 ![add_particles](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/f79b7a16-97e9-4da6-bd13-b67b2645a11f)
 
-Remove Particles: 
+Remove/Add Particles: 
 
-![rm_particles](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/db3d6f6a-9db7-4079-a116-8b3b573e27f3)
+![rm_particles](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/7d19c1e5-b239-4e4f-a7e1-2c0645d11180)
+![rm_particles (1)](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/d5c40519-644e-41a2-b33d-be8a8453a292)
 
 Size Change:
 
