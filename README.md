@@ -40,13 +40,10 @@ Click and Drag Particle:
 
 ![drag_particle](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/70e36e10-b472-47da-8da0-371c0dcead61)
 
-Increase Gravity:
+Increase/Decrease Gravity:
 
-![gravity_down](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/9f99571b-fb04-4d85-ae7d-b3e58484eede)
-
-Decrease Gravity:
-
-![gravity_up](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/38cec86c-778a-4c75-938a-6bcf6491476a)
+![gravity_down](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/0b3c781c-9d6f-422a-af30-94ab87c3f31b)
+![gravity_up](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/dee8c3f7-c64e-4e7b-8bcc-2ad39d542282)
 
 Add Particles:
 
