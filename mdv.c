@@ -166,7 +166,7 @@ void ApplyBoundaryCond() {
 		for (k=0; k<3; k++)  {
 
       if (r[n][k] + atom_radius > Region[k] || r[n][k] - atom_radius < 0) {
-
+        // Check if outside bounds
         if (r[n][k] - atom_radius < 0)
           r[n][k] = 0.0 + atom_radius;
         else
@@ -499,7 +499,8 @@ void MyKeyboardFunc(unsigned char Key, int x, int y)
       makeAtoms();
       break;
     case 'v': // Remove a particle from system
-      nAtom--; 
+      if (nAtom > 0)
+        nAtom--; 
       makeAtoms();
       break;
     case 'q': // Quit program

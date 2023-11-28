@@ -25,3 +25,7 @@ Interactive options:
 - 'd' decrease damping coefficient
 - 'f' increase damping coefficient
 - 'm' toggle on/off mapping the particle velocity to 3D color cube
+
+Assumptions
+---------------
+- All particles are equal size and equal mass
