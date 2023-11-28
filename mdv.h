@@ -1,5 +1,5 @@
 /***********************************************************************
-  mdv.h: an include file for mdv.c
+  particle-collision.h: an include file for particle-collision.c
 ***********************************************************************/
 #define Ratom 1.0         /* Default RGB color of an atom */
 #define Gatom 0.0
