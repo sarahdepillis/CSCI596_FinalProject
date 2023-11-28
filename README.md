@@ -38,7 +38,7 @@ Rotate View:
 
 Click and Drag Particle:
 
-![drag_particle](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/70e36e10-b472-47da-8da0-371c0dcead61)
+![drag_particle](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/54a1fcf6-5979-4c70-8408-810cf626ed9e)
 
 Increase/Decrease Gravity:
 
