@@ -33,7 +33,9 @@ Interactive options:
 
 
 
+![rotating](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/ff2ef9e5-25e0-4979-8125-919f99506631)
 
-![rotating](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/2a3eeddc-547e-48b8-b5e2-913c4cd0dd23)
+![damping_coeeff_gt1](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/51d31f7d-d32d-44e2-b194-de3a5ab852f2)
+
 
 
