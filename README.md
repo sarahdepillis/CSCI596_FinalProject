@@ -48,6 +48,18 @@ Decrease Gravity:
 
 ![gravity_up](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/38cec86c-778a-4c75-938a-6bcf6491476a)
 
+Add Particles:
+
+![add_particles](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/f79b7a16-97e9-4da6-bd13-b67b2645a11f)
+
+Remove Particles: 
+
+![rm_particles](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/db3d6f6a-9db7-4079-a116-8b3b573e27f3)
+
+Size Change:
+
+![size_change](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/d1de753d-76e8-4f05-bdd5-08060a76a9b1)
+
 Damping Coefficient Greater Than One:
 
 ![damping_coeeff_gt1](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/51d31f7d-d32d-44e2-b194-de3a5ab852f2)
