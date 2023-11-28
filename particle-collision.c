@@ -1,9 +1,9 @@
 /***********************************************************************
-  Program mdv.c--ball collision simulation.
+  Program particle-collision.c -- ball collision simulation.
   Required files
-    mdv.h:   Include file
+    particle-collision.h:   Include file
 ***********************************************************************/
-#include "mdv.h"
+#include "particle-collision.h"
 #include <stdio.h>
 #include <math.h>
 #define GL_SILENCE_DEPRECATION
