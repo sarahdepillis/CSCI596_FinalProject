@@ -58,7 +58,11 @@ Remove Particles:
 
 Size Change:
 
-![size_change](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/d1de753d-76e8-4f05-bdd5-08060a76a9b1)
+![size_change](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/7611ea71-b0e8-4f5e-b214-85f1d4b5e5f3)
+![size_change (1)](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/e27302ca-7575-423c-a3b0-c88572b73d95)
+![size_change (2)](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/53698618-e518-443c-8909-f6ba40ef018c)
+
+
 
 Damping Coefficient Greater Than One:
 
