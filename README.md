@@ -44,6 +44,7 @@ If $`d < 2*r`$, a collision between two particles has occurred.
 Now new velocity vectors need to be calculated.
 
 1. Find the normal vector between the two particles: $`N = s_A - s_B `$
+2. Get the square of the magnitude of the normal vector by taking the dot product or it with itself: $`||N||^2 = N \cdot N`$
 
 
 $`\sqrt {\sum _{i=1}^{n}  \left( q_{i}-p_{i}\right)^2 }`$
