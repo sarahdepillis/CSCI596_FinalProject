@@ -26,12 +26,17 @@ $`0 \geq y \geq R_y`$ or
 $`0 \geq z \geq R_z`$  
 a wall collision has occurred. 
 
-If $`0 \geq x \geq R_x`$ then $`v_x = -1 * v_x`$  
-If $`0 \geq y \geq R_y`$ then $`v_y = -1 * v_y`$  
-If $`0 \geq z \geq R_z`$ then $`v_z = -1 * v_z`$  
+If $`0 \geq x \geq R_x`$ then $`v_x = -1 * D * v_x`$  
+If $`0 \geq y \geq R_y`$ then $`v_y = -1 * D * v_y`$  
+If $`0 \geq z \geq R_z`$ then $`v_z = -1 * D * v_z`$  
+Where D is the damping coefficient if one exists
 
 
+### Particle Collisions
+Particle A has a position, $`s_A = \begin{bmatrix} x_1 \\ y_1 \\ z_1\end{bmatrix}`$
+Particle B has a position, $`s_B = \begin{bmatrix} x_2 \\ y_2 \\ z_2\end{bmatrix}`$
 
+If the distance between the two particles $`\sqrt {\sum _{i=1}^{n}  \left( q_{i}-p_{i}\right)^2 }`$
 
 ![image](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/3bcc8f04-973a-4c7d-baca-5d40c8f4329a)
 
