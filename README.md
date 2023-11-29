@@ -48,7 +48,10 @@ Now new velocity vectors need to be calculated.
 3. Divide the normal vector by its magnitude to get the unit norm vector: $`\vec{n} = \frac{\vec{N}}{||N||}`$
 4. Get the relative velocity between the two particles: $`\vec{V} = v_A - v_B`$
 5. Find the dot product of the unit norm vector and the relative velocity vector: $`vn = \vec{V} \cdot  \vec{n}`$
-6. Multiply the resulting dot product with the unit norm vector: $`vn * \vec{n}`$
+6. Multiply the resulting dot product with the unit norm vector: $`\vec{VN} = vn * \vec{n}`$
+7. Find the resulting velocities for each particle:
+   - $`v_A = (v_A - \vec{VN}) * collisionDamping `$
+   - $`v_B = (v_B + \vec{VN}) * collisionDamping `$
 
 
 $`\sqrt {\sum _{i=1}^{n}  \left( q_{i}-p_{i}\right)^2 }`$
