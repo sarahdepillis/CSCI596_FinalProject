@@ -35,8 +35,11 @@ Where D is the damping coefficient if one exists
 ### Particle Collisions
 Particle A has a position, $`s_A = \begin{bmatrix} x_1 \\ y_1 \\ z_1\end{bmatrix}`$
 Particle B has a position, $`s_B = \begin{bmatrix} x_2 \\ y_2 \\ z_2\end{bmatrix}`$
+Both particles have radius r.
 
-If the distance between the two particles $`\sqrt {\sum _{i=1}^{n}  \left( q_{i}-p_{i}\right)^2 }`$
+If the distance between the two particles is less than to time the particle radius, $$d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2 + (z_2 - z_1)^2} < 2*r$$
+
+$`\sqrt {\sum _{i=1}^{n}  \left( q_{i}-p_{i}\right)^2 }`$
 
 ![image](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/3bcc8f04-973a-4c7d-baca-5d40c8f4329a)
 
