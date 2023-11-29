@@ -20,13 +20,13 @@ Collisions
 ### Wall Collisions
 A particle that lives in a region, $`R = \begin{bmatrix} R_x \\ R_y \\ R_z \end{bmatrix}, `$ has a position, $`s = \begin{bmatrix} x \\ y \\ z\end{bmatrix}`$
 
-\indent When \\
-\indent $`0 \leq x \leq R_x`$ \newline
+\indent When  
+\indent $`0 \leq x \leq R_x`$  
 \indent Or \newline
-\indent $`0 \leq y \leq R_y`$ \newline
-\indent Or \newline
-\indent $`0 \leq z \leq R_z`$ \newline
-\indent a collsion has occured. \newline
+\indent $`0 \leq y \leq R_y`$  
+\indent Or  
+\indent $`0 \leq z \leq R_z`$  
+\indent a collsion has occured.  
 
 
 ![image](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/3bcc8f04-973a-4c7d-baca-5d40c8f4329a)
