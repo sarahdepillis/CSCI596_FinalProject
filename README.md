@@ -3,7 +3,7 @@ Interactive Colliding Particle System Simulator
 
 Compiling
 ---------------
-To compile mdv.c, type:
+To compile particle-collision.c, type:
 cc -o particle-collision particle-collision.c -L/System/Library/Frameworks -framework GLUT -framework OpenGL -lm
 
 To run particle-collision.c, type:
@@ -11,7 +11,7 @@ To run particle-collision.c, type:
 
 Assumptions
 ---------------
-- All particles are equal size and equal mass
+- All particles are equal in size and mass
 
 
 Collisions
@@ -19,15 +19,16 @@ Collisions
 
 ### Wall Collisions
 A particle that lives in a region, $`R = \begin{bmatrix} R_x \\ R_y \\ R_z \end{bmatrix}, `$ has a position, $`s = \begin{bmatrix} x \\ y \\ z\end{bmatrix}`$ and a velocity of $`v = \begin{bmatrix} v_x \\ v_y \\ v_z\end{bmatrix}`$
+
 When  
 $`0 \leq x \leq R_x`$ or  
 $`0 \leq y \leq R_y`$ or  
 $`0 \leq z \leq R_z`$  
-a wall collsion has occurred. 
+a wall collision has occurred. 
 
-If $`0 \leq x \leq R_x`$, $`v_x = -1 * v_x`$  
-If $`0 \leq y \leq R_y`$, $`v_y = -1 * v_y`$  
-If $`0 \leq z \leq R_z`$, $`v_z = -1 * v_z`$  
+If $`0 \leq x \leq R_x`$ then $`v_x = -1 * v_x`$  
+If $`0 \leq y \leq R_y`$ then $`v_y = -1 * v_y`$  
+If $`0 \leq z \leq R_z`$ then $`v_z = -1 * v_z`$  
 
 
 
