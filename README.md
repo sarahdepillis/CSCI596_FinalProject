@@ -18,14 +18,12 @@ Collisions
 ---------------
 
 ### Wall Collisions
-A particle that lives in a region , $`R = \begin{bmatrix} R_x \\ R_y \\ R_z \end{bmatrix}, `$ has a position, $`s = \begin{bmatrix} x \\ y \\ z\end{bmatrix}`$
+A particle that lives in a region, $`R = \begin{bmatrix} R_x \\ R_y \\ R_z \end{bmatrix}, `$ has a position, $`s = \begin{bmatrix} x \\ y \\ z\end{bmatrix}`$
 
 When 
-```
-$`0 \leq x \leq R_x `$ OR
-$`0 \leq y \leq R_y `$ OR
-$`0 \leq z \leq R_z `$
-```
+\indent $`0 \leq x \leq R_x `$ OR
+\indent $`0 \leq y \leq R_y `$ OR
+\indent $`0 \leq z \leq R_z `$
 a collsion has occured.
 
 
