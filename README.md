@@ -33,11 +33,18 @@ Where D is the damping coefficient if one exists
 
 
 ### Particle Collisions
-Particle A has a position, $`s_A = \begin{bmatrix} x_1 \\ y_1 \\ z_1\end{bmatrix}`$
-Particle B has a position, $`s_B = \begin{bmatrix} x_2 \\ y_2 \\ z_2\end{bmatrix}`$
+Particle A has a position, $`s_A = \begin{bmatrix} x_1 \\ y_1 \\ z_1\end{bmatrix}`$ and velocity $`v_A = \begin{bmatrix} v_x1 \\ v_y1 \\ v_z1\end{bmatrix}`$
+Particle B has a position, $`s_B = \begin{bmatrix} x_2 \\ y_2 \\ z_2\end{bmatrix}`$ and velocity $`v_B = \begin{bmatrix} v_x2 \\ v_y2 \\ v_z2\end{bmatrix}`$
 Both particles have radius r.
 
-If the distance between the two particles $`d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2 + (z_2 - z_1)^2}`$ is less $`2*r`$
+Find the distance between the two particles: $$d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2 + (z_2 - z_1)^2}$$
+
+If $$d < 2*r$$, a collision between two particles has occurred.
+
+Now new velocity vectors need to be calculated.
+
+1. Find the normal vector between the two particles: $`N = s_A - s_B `$
+
 
 $`\sqrt {\sum _{i=1}^{n}  \left( q_{i}-p_{i}\right)^2 }`$
 
