@@ -33,8 +33,8 @@ Where D is the damping coefficient if one exists
 
 
 ### Particle Collisions
-Particle A has a position, $`s_A = \begin{bmatrix} x_1 \\ y_1 \\ z_1\end{bmatrix}`$ and velocity $`v_A = \begin{bmatrix} v_x1 \\ v_y1 \\ v_z1\end{bmatrix}`$  
-Particle B has a position, $`s_B = \begin{bmatrix} x_2 \\ y_2 \\ z_2\end{bmatrix}`$ and velocity $`v_B = \begin{bmatrix} v_x2 \\ v_y2 \\ v_z2\end{bmatrix}`$  
+Particle A has a position, $`s_A = \begin{bmatrix} x_1 \\ y_1 \\ z_1\end{bmatrix}`$ and velocity $`\vec{v_A} = \begin{bmatrix} v_x1 \\ v_y1 \\ v_z1\end{bmatrix}`$  
+Particle B has a position, $`s_B = \begin{bmatrix} x_2 \\ y_2 \\ z_2\end{bmatrix}`$ and velocity $`\vec{v_B} = \begin{bmatrix} v_x2 \\ v_y2 \\ v_z2\end{bmatrix}`$  
 Both particles have radius r.
 
 Find the distance between the two particles: $$d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2 + (z_2 - z_1)^2}$$
@@ -50,11 +50,9 @@ Now new velocity vectors need to be calculated.
 5. Find the dot product of the unit norm vector and the relative velocity vector: $`vn = \vec{V} \cdot  \vec{n}`$
 6. Multiply the resulting dot product with the unit norm vector: $`\vec{VN} = vn * \vec{n}`$
 7. Find the resulting velocities for each particle:
-   - $`v_A = (v_A - \vec{VN}) * collisionDamping `$
-   - $`v_B = (v_B + \vec{VN}) * collisionDamping `$
+   - $`v_A = (\vec{v_A} - \vec{VN}) * collisionDamping `$
+   - $`v_B = (\vec{v_B} + \vec{VN}) * collisionDamping `$
 
-
-$`\sqrt {\sum _{i=1}^{n}  \left( q_{i}-p_{i}\right)^2 }`$
 
 ![image](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/3bcc8f04-973a-4c7d-baca-5d40c8f4329a)
 
