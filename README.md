@@ -22,10 +22,10 @@ A particle that lives in a region, $`R = \begin{bmatrix} R_x \\ R_y \\ R_z \end{
 
 When  
 $`0 \leq x \leq R_x`$  
-&nbsp; Or  
+(&nbsp;) Or  
 $`0 \leq y \leq R_y`$  
-&nbsp; Or  
-$`0 \leq z \leq R_z`$  
+(&nbsp;) Or  
+$`0 \leq z \leq R_z`$,  
 a collsion has occured.  
 
 
