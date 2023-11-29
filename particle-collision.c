@@ -224,6 +224,7 @@ void ApplyBoundaryCond() {
           for (k=0; k<3; k++)  {
             norm[k] = r[n][k] - r[n2][k];
             norm_sum += pow(norm[k],2);
+            norm[k] = norm[k] / sqrt(norm_sum);
 
             if (n == clickedAtom)
               relative_v[k] = clickedAtomNewVelocity[k] - rv[n2][k];
@@ -232,14 +233,6 @@ void ApplyBoundaryCond() {
             else
               relative_v[k] = rv[n][k] - rv[n2][k];
           }
-          for (k=0; k<3; k++)  {
-            norm[k] = norm[k] / sqrt(norm_sum);
-          }
-
-          printf("Collision! \n Particle 1 position: %f,%f,%f \nParticle 2 position: %f,%f,%f \n",
-              r[n][0], r[n][1], r[n][2], r[n2][0], r[n2][1], r[n2][2]);
-          printf("Normal vector between two particles: %f, %f, %f \n", norm[0], norm[1], norm[2]);
-
 
           // Shift particles so they arent overlapping
           double shift_dist = 2.0*atom_radius - dst;
@@ -289,12 +282,8 @@ void ApplyBoundaryCond() {
 
           else {
             for (k=0; k<3; k++)  {
-              long double rvn_old = rv[n][k];
-              long double rvn2_old = rv[n2][k];
-
               rv[n][k] = (rv[n][k] - dot_scalar_norm[k]) * collisionDamping;
               rv[n2][k] = (rv[n2][k] + dot_scalar_norm[k]) * collisionDamping;
-              
             }
           }
 
