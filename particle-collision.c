@@ -10,6 +10,7 @@
 #include <OpenGL/gl.h>    /* Header file for the OpenGL library */
 #include <OpenGL/glu.h>   /* Header file for the GLu library */
 #include <GLUT/glut.h>    /* Header file for the GLut library */
+
 #include <time.h>
 #include <stdlib.h>
 #include <sys/time.h>     /* for gettimeofday() */ 
@@ -61,8 +62,9 @@ double dot_product(double *v, double *u, int n)
 double distance(double *p1, double *p2, int n) {
   double dist = 0.0;
   for (int i = 0; i < n; i++){
-    dist = sqrt(pow(p1[0]-p2[0],2.0)+pow(p1[1]-p2[1],2.0)+pow(p1[2]-p2[2],2.0));
+    dist = dist + pow(p1[i]-p2[i],2.0);
   }
+  dist = sqrt(dist);
   return dist;
 }
 double magnitude(double *v, int n) {
@@ -76,7 +78,7 @@ void SingleStep();
 void HalfKick();
 void ApplyBoundaryCond();
 void animate(void);
-float * mapVelocityToColor();
+float * mapVelocityToColor(double x, double y, double z);
 
 /*----------------------------------------------------------------------------*/
 void InitConf() {
@@ -217,6 +219,8 @@ void ApplyBoundaryCond() {
         
         if (dst <= 2 * atom_radius) {
           // Get norm vector between two particles
+
+
           for (k=0; k<3; k++)  {
             norm[k] = r[n][k] - r[n2][k];
             norm_sum += pow(norm[k],2);
@@ -231,6 +235,10 @@ void ApplyBoundaryCond() {
           for (k=0; k<3; k++)  {
             norm[k] = norm[k] / sqrt(norm_sum);
           }
+
+          printf("Collision! \n Particle 1 position: %f,%f,%f \nParticle 2 position: %f,%f,%f \n",
+              r[n][0], r[n][1], r[n][2], r[n2][0], r[n2][1], r[n2][2]);
+          printf("Normal vector between two particles: %f, %f, %f \n", norm[0], norm[1], norm[2]);
 
 
           // Shift particles so they arent overlapping
