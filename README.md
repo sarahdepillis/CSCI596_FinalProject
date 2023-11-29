@@ -45,7 +45,10 @@ Now new velocity vectors need to be calculated.
 
 1. Find the normal vector between the two particles: $`\vec{N} = s_A - s_B `$
 2. Get the magnitude of the normal vector by taking the square root of the dot product of the normal vector with itself: $`||N|| = \sqrt {\vec{N} \cdot \vec{N}}`$
-3. Divide the normal vector by its magnitude to get the unit norm vector: $`\vec{n} = \vec{N} / ||N||`$
+3. Divide the normal vector by its magnitude to get the unit norm vector: $`\vec{n} = \frac{\vec{N}}{||N||}`$
+4. Get the relative velocity between the two particles: $`\vec{V} = v_A - v_B`$
+5. Find the dot product of the unit norm vector and the relative velocity vector: $`vn = \vec{V} \cdot  \vec{n}`$
+6. Multiply the resulting dot product with the unit norm vector: $`vn * \vec{n}`$
 
 
 $`\sqrt {\sum _{i=1}^{n}  \left( q_{i}-p_{i}\right)^2 }`$
