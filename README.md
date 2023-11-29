@@ -20,8 +20,8 @@ Collisions
 ### Wall Collisions
 A particle that lives in a region, $`R = \begin{bmatrix} R_x \\ R_y \\ R_z \end{bmatrix}, `$ has a position, $`s = \begin{bmatrix} x \\ y \\ z\end{bmatrix}`$
 
-When \n
-$`0 \leq x \leq R_x`$ 
+When
+\indent $`0 \leq x \leq R_x`$ 
 Or
 $`0 \leq y \leq R_y`$
 Or
