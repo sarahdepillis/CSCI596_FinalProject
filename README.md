@@ -21,14 +21,14 @@ Collisions
 A particle that lives in a region, $`R = \begin{bmatrix} R_x \\ R_y \\ R_z \end{bmatrix}, `$ has a position, $`s = \begin{bmatrix} x \\ y \\ z\end{bmatrix}`$ and a velocity of $`v = \begin{bmatrix} v_x \\ v_y \\ v_z\end{bmatrix}`$
 
 When  
-$`0 \leq x \leq R_x`$ or  
-$`0 \leq y \leq R_y`$ or  
-$`0 \leq z \leq R_z`$  
+$`0 \geq x \geq R_x`$ or  
+$`0 \geq y \geq R_y`$ or  
+$`0 \geq z \geq R_z`$  
 a wall collision has occurred. 
 
-If $`0 \leq x \leq R_x`$ then $`v_x = -1 * v_x`$  
-If $`0 \leq y \leq R_y`$ then $`v_y = -1 * v_y`$  
-If $`0 \leq z \leq R_z`$ then $`v_z = -1 * v_z`$  
+If $`0 \geq x \geq R_x`$ then $`v_x = -1 * v_x`$  
+If $`0 \geq y \geq R_y`$ then $`v_y = -1 * v_y`$  
+If $`0 \geq z \geq R_z`$ then $`v_z = -1 * v_z`$  
 
 
 
