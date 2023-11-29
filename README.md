@@ -18,13 +18,18 @@ Collisions
 ---------------
 
 ### Wall Collisions
-A particle that lives in a region, $`R = \begin{bmatrix} R_x \\ R_y \\ R_z \end{bmatrix}, `$ has a position, $`s = \begin{bmatrix} x \\ y \\ z\end{bmatrix}`$
-
+A particle that lives in a region, $`R = \begin{bmatrix} R_x \\ R_y \\ R_z \end{bmatrix}, `$ has a position, $`s = \begin{bmatrix} x \\ y \\ z\end{bmatrix}`$ and a velocity of $`v = \begin{bmatrix} v_x \\ v_y \\ v_z\end{bmatrix}`$
 When  
 $`0 \leq x \leq R_x`$ or  
 $`0 \leq y \leq R_y`$ or  
-$`0 \leq z \leq R_z`$,  
-a collsion has occured.  
+$`0 \leq z \leq R_z`$  
+a wall collsion has occurred. 
+
+If $`0 \leq x \leq R_x`$, $`v_x = -1 * v_x`$  
+If $`0 \leq y \leq R_y`$, $`v_y = -1 * v_y`$  
+If $`0 \leq z \leq R_z`$, $`v_z = -1 * v_z`$  
+
+
 
 
 ![image](https://github.com/sarahdepillis/CSCI596_FinalProject/assets/28903687/3bcc8f04-973a-4c7d-baca-5d40c8f4329a)
